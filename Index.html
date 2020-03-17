@@ -8,13 +8,19 @@ h1 {
 <script>
     function Gettable(){
         var xhrGet = new XMLHttpRequest();
-
+        xhr.onreadystatechange = function() {
+            console.log(this.responsetext);
+            alert(this.responsetext);
+        }
+        xhr.open("GET", "http://localhost:8082/get", true)
+        xhr.send();
     }
 
 </script>
+
+<h1 id="titelBovenaan">Placeholder: website Qien</h1>
 
 <div>
     <button onclick="GetTable()">GET</button>
 </div>
 
-<h1 id="titelBovenaan">Placeholder: website Qien</h1>
