@@ -5,6 +5,14 @@
     <link rel="stylesheet" type="text/css" href="vendors/css/grid.css">
     <link rel="stylesheet" type="text/css" href="resources/css/style.css">
     <h1 id="titelBovenaan">Placeholder: website Qien</h1>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
     ADMIN MODUS
 </head>
 
@@ -16,16 +24,32 @@
         }
     </style>
 
+    <div id="persoon"></div>
+    <div id="verwijderPersoon">
+        <input type="text" id="delGb">
+        <button id="del" onclick="deleteGebruiker()">verwijderPersoon</button>
+    </div>
+
+    <div id="updatePersoon">
+        <input type="text" id="upPersoon">
+        <button id="upButton" onclick="updateGebruiker()">aanpassing</button>
+    </div>
+
     <script src=jquerycode.js></script>
 
     <script>
 
         function Getpersoon() {
-            var xhrGet = new XMLHttpRequest();
+            var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
-                console.log(this.responsetext);
-                alert(this.responsetext);
-            }
+                var dePersoon = JSON.parse(this.responseText);
+                var rString = "";
+                for (var x = 0; x < dePersoon.length; x++) {
+                    rString += dePersoon[x].voornaam + dePersoon[x].achternaam + dePersoon[x].id + "<br>";
+
+                }
+                document.getElementById("persoon").innerHTML = rString;
+            };
             xhr.open("GET", "http://localhost:8082/get", true)
             xhr.send();
         }
@@ -41,21 +65,60 @@
             var persoon = {};
             persoon.voornaam = vNaam;
             persoon.achternaam = aNaam;
-            persoon.email = eMail;
+            persoon.emailAdres = eMail;
             persoon.adres = adres;
-            persoon.geboortedatum = geboortedatum;
-            persoon.telefoonnummer = telefoonnummer;
-
+            persoon.geboorteDatum = geboortedatum;
+            persoon.telefoonNummer = telefoonnummer;
+            console.log(persoon);
 
             var abc = JSON.stringify(persoon);
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
-
+                document.getElementById("persoon").innerHTML = this.responseText;
+                Getpersoon();
             }
             xhr.open("POST", "http://localhost:8082/post", true);
-            xhr.setRequestHeader("Content-type", "application/json")
+            xhr.setRequestHeader("Content-type", "application/json");
             xhr.send(abc);
         }
+
+        function deleteGebruiker() {
+            var delGebruiker = document.getElementById('delGb').value;
+            var url = "http://localhost:8082/delete/";
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", url + delGebruiker, true)
+            xhr.onload = function () {
+                var gebruiker = JSON.parse(xhr.responseText);
+
+            }
+            xhr.onreadystatechange = function () {
+                Getpersoon();
+
+            }
+            xhr.send();
+        }
+        function updateGebruiker() {
+            var url = "http://localhost:8082/update/";
+            var input = document.getElementById('upPersoon').value;
+            var persoon = {
+                voornaam: document.getElementById('voornaam').value,
+                achternaam: document.getElementById('achternaam').value,
+            };
+            var up = JSON.stringify(persoon);
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", url + input, true);
+            xhr.setRequestHeader('Content-type', 'application/json');
+            xhr.onload = function () {
+                var user = JSON.parse(xhr.responseText)
+            }
+            xhr.onreadystatechange = function () {
+                Getpersoon();
+            }
+            xhr.send(up);
+        }
+
+        window.onload = Getpersoon;
+
     </script>
 
 
@@ -65,6 +128,12 @@
         <br><br>
         <div>
             <form>
+                <select name="aanhef">
+                    <option value="Dhr.">Dhr.</option>
+                    <option value="Mevr.">Mevr.</option>
+                    <option value="niks"></option>
+                </select>
+
                 <label for="voornaam">Voornaam:</label>
                 <input type="text" id="voornaam">
 
@@ -78,16 +147,42 @@
                 <input type="text" id="adres">
 
                 <label for="geboortedatum">Geboortedatum:</label>
-                <input type="text" id="geboortedatum">
+                <input type="date" id="geboortedatum">
 
                 <label for="telefoonnummer">Telefoonnummer:</label>
                 <input type="text" id="telefoonnummer">
 
 
                 <input type="button" value="Voeg medewerker toe" onclick="addMedewerkertoDB()">
+                <br><br>
+                <table style="width:50%">
+                    <tr>
+                        <th>Voornaam</th>
+                        <th>Achternaam</th>
+                        <th>E-mail</th>
+                    </tr>
+                    <tr>
+                        <td>Piet</td>
+                        <td>Pietjes</td>
+                        <td>50</td>
+                    </tr>
+                    <tr>
+                        <td>Jan</td>
+                        <td>Janssen</td>
+                        <td>94</td>
+                    </tr>
+                    <tr>
+                        <td>Peter</td>
+                        <td>Petersen</td>
+                        <td>80</td>
+                    </tr>
+                </table>
+
             </form>
         </div>
     </div>
+
+
 
 </body>
 
