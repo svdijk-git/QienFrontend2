@@ -1,13 +1,10 @@
 <html>
   <head>
-    <!-- <link rel="stylesheet" type="text/css" href="vendors/css/normalize.css" />
-    <link rel="stylesheet" type="text/css" href="vendors/css/grid.css" />
-    <link rel="stylesheet" type="text/css" href="resources/css/style.css" /> -->
     <link rel="stylesheet" type="text/css" href="mystyle.css" />
     <h1 id="titelBovenaan">Placeholder: website Qien</h1>
     ADMIN MODUS
   </head>
-
+  <script src="jquerycode.js"></script>
   <body>
     <h4 id="titel">TOEVOEGEN WERKNEMER</h4>
 
@@ -26,7 +23,7 @@
       <br /><br />
       <div>
         <form>
-          <select name="aanhef">
+          <select id="titel" name="titel">
             <option value="Dhr.">Dhr.</option>
             <option value="Mevr.">Mevr.</option>
             <option value="niks"></option>
@@ -50,6 +47,9 @@
           <label for="telefoonnummer">Telefoonnummer:</label>
           <input type="text" id="telefoonnummer" />
 
+          <label for="owner">Opdrachtgever:</label>
+          <input type="text" id="owner" />
+
           <input
             type="button"
             value="Voeg medewerker toe"
@@ -59,9 +59,14 @@
 
           <table id="personenTabel" style="width:50%">
             <tr>
+              <th>Aanhef</th>
               <th>Voornaam</th>
               <th>Achternaam</th>
               <th>E-mail</th>
+              <th>Adres</th>
+              <th>Geboortedatum</th>
+              <th>Telefoonnummer</th>
+              <th>Opdrachtgever</th>
             </tr>
           </table>
         </form>
@@ -70,7 +75,7 @@
       </div>
     </div>
   </body>
-  <script src="jquerycode.js"></script>
+
   <script>
     function Getpersoon() {
       var xhr = new XMLHttpRequest();
@@ -79,9 +84,14 @@
         var rString = "";
         for (var x = 0; x < dePersoon.length; x++) {
           rString +=
+            dePersoon[x].id +
+            dePersoon[x].titel +
             dePersoon[x].voornaam +
             dePersoon[x].achternaam +
-            dePersoon[x].id +
+            dePersoon[x].emailAdres +
+            dePersoon[x].adres +
+            dePersoon[x].geboortedatum +
+            dePersoon[x].telefoonnummer +
             "<br>";
         }
         document.getElementById("persoon").innerHTML = rString;
@@ -95,15 +105,21 @@
         console.log(personen);
         for (const persoon of personen) {
           $("#personenTabel").append(`<tr>
+                <td>${persoon.titel} </td>
                 <td>${persoon.voornaam} </td>
                 <td>${persoon.achternaam} </td>
                 <td>${persoon.emailAdres} </td>
+                <td>${persoon.adres} </td>
+                <td>${persoon.geboorteDatum} </td>
+                <td>${persoon.telefoonNummer} </td>
+                <td>${persoon.owner} </td>
                 </tr>`);
         }
       });
     }
 
     function addMedewerkertoDB() {
+      var titel = document.getElementById("titel").value;
       var vNaam = document.getElementById("voornaam").value;
       var aNaam = document.getElementById("achternaam").value;
       var eMail = document.getElementById("email").value;
@@ -111,6 +127,7 @@
       var geboortedatum = document.getElementById("geboortedatum").value;
       var telefoonnummer = document.getElementById("telefoonnummer").value;
       var persoon = {};
+      persoon.titel = titel;
       persoon.voornaam = vNaam;
       persoon.achternaam = aNaam;
       persoon.emailAdres = eMail;
@@ -147,8 +164,13 @@
       var url = "http://localhost:8082/update/";
       var input = document.getElementById("upPersoon").value;
       var persoon = {
+        titel: document.getElementById("titel").value,
         voornaam: document.getElementById("voornaam").value,
-        achternaam: document.getElementById("achternaam").value
+        achternaam: document.getElementById("achternaam").value,
+        emailAdres: document.getElementById("eMail").value,
+        adres: document.getElementById("adres").value,
+        geboorteDatum: document.getElementById("geboortedatum").value,
+        telefoonNummer: document.getElementById("telefoonnummer").value
       };
       var up = JSON.stringify(persoon);
       var xhr = new XMLHttpRequest();
@@ -162,8 +184,43 @@
       };
       xhr.send(up);
     }
+    
+//opdrachtgever
+    function Getopdrachtgever() {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        var deOpdrachtgever = JSON.parse(this.responseText);
+        var rString = "";
+        for (var x = 0; x < deOpdrachtgever.length; x++) {
+          rString +=
+            deOpdrachtgever[x].opdrachtgeverID +
+            deOpdrachtgever[x].naamOpdrachtgever("<br>");
+        }
+        document.getElementById("opdrachtgever").innerHTML = rString;
+      };
+      xhr.open("GET", "http://localhost:8082/getbyidOpdrachtgever/", true);
+      xhr.send();
+    }
+
+    function addOpdrachtgevertoDB() {
+      var oNaam = document.getElementById("naamOpdrachtgever").value;
+      var opdrachtgever = {};
+      opdrachtgever.naamOpdrachtgever = oNaam;
+      console.log(opdrachtgever);
+
+      var abc = JSON.stringify(opdrachtgever);
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        document.getElementById("opdrachtgever").innerHTML = this.responseText;
+        Getopdrachtgever();
+      };
+      xhr.open("POST", "http://localhost:8082/postopdrachtgever", true);
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.send(abc);
+    }
     function init() {
-      Getpersoon();
+      //Getopdrachtgever();
+      // Getpersoon();
       refreshTabel();
     }
     window.onload = init;
