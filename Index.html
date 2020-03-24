@@ -2,7 +2,7 @@
   <head>
     <link rel="stylesheet" type="text/css" href="mystyle.css" />
     <h1 id="titelBovenaan">Placeholder: website Qien</h1>
-    ADMIN MODUS
+    ADMIN 
   </head>
   <script src="jquerycode.js"></script>
   <body>
@@ -12,12 +12,12 @@
     <div id="verwijderPersoon">
       <input type="text" id="delGb" />
       <button id="del" onclick="deleteGebruiker()">verwijderPersoon</button>
-    </div>
+    </div><br>
 
     <div id="updatePersoon">
       <input type="text" id="upPersoon" />
       <button id="upButton" onclick="updateGebruiker()">aanpassing</button>
-    </div>
+    </div><br>
     <div>
       <button onclick="Getpersoon()">GET</button>
       <br /><br />
@@ -33,29 +33,29 @@
           <input type="text" id="voornaam" />
 
           <label for="achternaam">Achternaam:</label>
-          <input type="text" id="achternaam" />
+          <input type="text" id="achternaam" /><br><br>
 
           <label for="email">E-mailadres:</label>
-          <input type="text" id="email" />
+          <input type="email" id="email" />
 
           <label for="adres">Adres:</label>
-          <input type="text" id="adres" />
+          <input type="text" id="adres" /><br><br>
+
+          <label for="woonplaats">Woonplaats:</label>
+          <input type="text" id="woonplaats" />
 
           <label for="geboortedatum">Geboortedatum:</label>
           <input type="date" id="geboortedatum" />
 
           <label for="telefoonnummer">Telefoonnummer:</label>
-          <input type="text" id="telefoonnummer" />
-
-          <label for="owner">Opdrachtgever:</label>
-          <input type="text" id="owner" />
+          <input type="text" id="telefoonnummer" /><br><br>
 
           <input
             type="button"
             value="Voeg medewerker toe"
             onclick="addMedewerkertoDB()"
           />
-          <br /><br />
+          <br><br>
 
           <table id="personenTabel" style="width:50%">
             <tr>
@@ -64,6 +64,7 @@
               <th>Achternaam</th>
               <th>E-mail</th>
               <th>Adres</th>
+              <th>Woonplaats</th>
               <th>Geboortedatum</th>
               <th>Telefoonnummer</th>
               <th>Opdrachtgever</th>
@@ -71,8 +72,27 @@
           </table>
         </form>
 
-        <button onclick="refreshTabel()">refreshing</button>
+        <button onclick="refreshTabel()">refresh</button>
       </div>
+    </div><br><br>
+    <div>
+      <form>
+        <label for="owner">Opdrachtgever:</label>
+        <input type="text" id="owner" />
+        <input
+        type="button"
+        value="Voeg opdrachtgever toe"
+        onclick="addOpdrachtgevertoDB()"
+      /><br><br>
+      <table id="opdrachtgeverTabel" style="width:20%">
+        <tr>
+          <th>Naam</th>
+        
+        </tr>
+      </table>
+     </form>
+     <button onclick="refreshTabelOpdrachtgever()">refresh opdrachtgevers</button>
+      
     </div>
   </body>
 
@@ -90,18 +110,19 @@
             dePersoon[x].achternaam +
             dePersoon[x].emailAdres +
             dePersoon[x].adres +
+            dePersoon[x].woonplaats +
             dePersoon[x].geboortedatum +
             dePersoon[x].telefoonnummer +
             "<br>";
         }
         document.getElementById("persoon").innerHTML = rString;
       };
-      xhr.open("GET", "http://localhost:8082/get", true);
+      xhr.open("GET", "http://localhost:8082/api/medewerkers", true);
       xhr.send();
-    }
+    } 
 
     function refreshTabel() {
-      $.getJSON("http://localhost:8082/get", function(personen) {
+      $.getJSON("http://localhost:8082/api/medewerkers", function(personen) {
         console.log(personen);
         for (const persoon of personen) {
           $("#personenTabel").append(`<tr>
@@ -110,10 +131,21 @@
                 <td>${persoon.achternaam} </td>
                 <td>${persoon.emailAdres} </td>
                 <td>${persoon.adres} </td>
+                <td>${persoon.woonplaats} </td>
                 <td>${persoon.geboorteDatum} </td>
                 <td>${persoon.telefoonNummer} </td>
-                <td>${persoon.owner} </td>
+                // <td>${persoon.opdrachtgever} </td>
                 </tr>`);
+        }
+      });
+    }
+    function refreshTabelOpdrachtgever() {
+      $.getJSON("http://localhost:8082/api/opdrachtgevers", function(werkgevers) {
+        console.log(opdrachtgevers);
+        for (const persoon of personen) {
+          $("#opdrachtgeverTabel").append(`<tr>
+                <td>${opdrachtgever.naamOpdrachtgever} </td>
+             </tr>`);
         }
       });
     }
@@ -124,14 +156,16 @@
       var aNaam = document.getElementById("achternaam").value;
       var eMail = document.getElementById("email").value;
       var adres = document.getElementById("adres").value;
+      var woonplaats = document.getElementById("woonplaats").value;
       var geboortedatum = document.getElementById("geboortedatum").value;
       var telefoonnummer = document.getElementById("telefoonnummer").value;
       var persoon = {};
-      persoon.titel = titel;
+      // persoon.titel = titel;
       persoon.voornaam = vNaam;
       persoon.achternaam = aNaam;
       persoon.emailAdres = eMail;
       persoon.adres = adres;
+      persoon.woonplaats = woonplaats;
       persoon.geboorteDatum = geboortedatum;
       persoon.telefoonNummer = telefoonnummer;
       console.log(persoon);
@@ -142,14 +176,14 @@
         document.getElementById("persoon").innerHTML = this.responseText;
         Getpersoon();
       };
-      xhr.open("POST", "http://localhost:8082/post", true);
+      xhr.open("POST", "http://localhost:8082/api/medewerkers", true);
       xhr.setRequestHeader("Content-type", "application/json");
       xhr.send(abc);
     }
 
     function deleteGebruiker() {
       var delGebruiker = document.getElementById("delGb").value;
-      var url = "http://localhost:8082/delete/";
+      var url = "http://localhost:8082/api/medewerkers/";
       var xhr = new XMLHttpRequest();
       xhr.open("DELETE", url + delGebruiker, true);
       xhr.onload = function() {
@@ -184,7 +218,8 @@
       };
       xhr.send(up);
     }
-    
+//medewerker
+
 //opdrachtgever
     function Getopdrachtgever() {
       var xhr = new XMLHttpRequest();
@@ -218,11 +253,25 @@
       xhr.setRequestHeader("Content-type", "application/json");
       xhr.send(abc);
     }
-    function init() {
-      //Getopdrachtgever();
-      // Getpersoon();
-      refreshTabel();
+
+    function deleteOpdrachtgever() {
+      var delOpdrachtgever = document.getElementById("delOg").value;
+      var url = "http://localhost:8082/deleteopdrachtgever/";
+      var xhr = new XMLHttpRequest();
+      xhr.open("DELETE", url + delOpdrachtgever, true);
+      xhr.onload = function() {
+        var gebruiker = JSON.parse(xhr.responseText);
+      };
+      xhr.onreadystatechange = function() {
+        Getopdrachtgever();
+      };
+      xhr.send();
     }
-    window.onload = init;
+    // function init() {
+    //   //Getopdrachtgever();
+    //   // Getpersoon();
+    //   refreshTabel();
+    // }
+    // window.onload = init;
   </script>
 </html>
