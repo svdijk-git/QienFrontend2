@@ -102,7 +102,7 @@
 
 <script>
 
-
+//gebruikers wordt medewerkers
   function Getpersoon() {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -145,16 +145,7 @@
       }
     });
   }
-  function refreshTabelOpdrachtgever() {
-    $.getJSON("http://localhost:8082/api/opdrachtgevers", function (opdrachtgevers) {
-      console.log(opdrachtgevers);
-      for (const opdrachtgever of opdrachtgevers) {
-        $("#opdrachtgeverTabel").append(`<tr>
-                <td>${opdrachtgever.naamOpdrachtgever} </td>
-             </tr>`);
-      }
-    });
-  }
+ 
 
   function addMedewerkertoDB() {
     var titel = document.getElementById("titel").value;
@@ -273,7 +264,18 @@
     };
     xhr.send();
   }
-
+  
+  function refreshTabelOpdrachtgever() {
+    $.getJSON("http://localhost:8082/api/opdrachtgevers", function (opdrachtgevers) {
+      console.log(opdrachtgevers);
+      for (const opdrachtgever of opdrachtgevers) {
+        $("#opdrachtgeverTabel").append(`<tr>
+                <td>${opdrachtgever.naamOpdrachtgever} </td>
+             </tr>`);
+      }
+    });
+  }
+  
   $(document).ready(function () {
     $('#bt').click(function () {
 
@@ -289,6 +291,10 @@
       $('#deze').text('Opdrachtgever: ' + this.options[this.selectedIndex].text);
     });
   });
+
+  //contactpersonen
+
+  
     // function init() {
     //   //Getopdrachtgever();
     //   // Getpersoon();
